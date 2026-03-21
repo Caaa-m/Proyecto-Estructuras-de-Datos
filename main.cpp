@@ -5,10 +5,11 @@
 #include <string>
 #include <direct.h>    // para crear carpeta en Windows
 #include "Funciones_Palabras/Crear_txt.h"
+#include "Recursos/Complejidad.h"
 using namespace std;
 
 int main() {
-    srand(time(0));
+    /* srand(time(0));
 
     string nombreCarpeta;
     cout << "Nombre de la carpeta: ";
@@ -28,7 +29,12 @@ int main() {
     }
 
     archivo.close();
-    cout << "Archivo guardado en: " << ruta << endl;
+    cout << "Archivo guardado en: " << ruta << endl; */
+    
+    string archivo;
+    cout << "Nombre del archivo a analizar: ";
+    cin >> archivo;
 
+    analizarArchivo(archivo);
     return 0;
 }
