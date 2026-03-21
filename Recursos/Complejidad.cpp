@@ -10,7 +10,8 @@ void analizarArchivo(string nombreArchivo) {
 
     int nivelActual = 0; //Nivel de anidación actual
     int maxNivel = 0; //Máximo nivel de anidación encontrado
-
+    Pila tiposDeBloque;  
+    
     while (getline(archivo, linea)) { //Lee una Línea del archivo y la guarda en Línea
                                       //Mientras haya una línea más por recorrer devuelve TRUE, si no devuelve FALSE
         if (linea.find("for") != string::npos || linea.find("while") != string::npos) { // Si se encuentra un while o for...
