@@ -7,9 +7,8 @@ using namespace std;
 chrono::high_resolution_clock::time_point inicio;
 
 void iniciarTiempo() {
-    inicio = chrono::high_resolution_clock::now();
-}
-
+    inicio = chrono::high_resolution_clock::now(); //uso la librería, y pongo el relog mas preciso disponible en el sistema
+}                                                   //Capturo el momento actual y lo guardo en la variable inicio
 void detenerTiempo(string etiqueta) {
     auto fin = chrono::high_resolution_clock::now();
 
