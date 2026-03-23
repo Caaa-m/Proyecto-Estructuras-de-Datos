@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
-#include "AVL_Tree.h"
+#include "../Ordenamiento/AVL_Tree.h"
 
 // Estimacion de memoria para cada estructura de datos
 
