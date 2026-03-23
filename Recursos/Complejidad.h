@@ -1,5 +1,9 @@
-#pragma once
+#ifndef COMPLEJIDAD_H
+#define COMPLEJIDAD_H
 
-// Muestra en consola la tabla comparativa de complejidad Big-O
-// de los tres algoritmos implementados
-void mostrarComplejidad();
+#include <string>
+using namespace std;
+
+void analizarArchivo(string nombreArchivo);
+
+#endif
