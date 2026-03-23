@@ -1,35 +1,37 @@
 #include "Heap_Sort.h"
 #include <vector>
 #include <string>
+using namespace std;
 
-// Mantiene la propiedad del max-heap desde el nodo i hacia abajo
-static void heapify(std::vector<std::string>& arr, int n, int i) {
-    int largest = i;       // raiz
-    int left    = 2 * i + 1;
-    int right   = 2 * i + 2;
+// Ajusta el heap
+void heapify(vector<string>& arr, int n, int i) {
+    int mayor = i;
+    int izq = 2 * i + 1;
+    int der = 2 * i + 2;
 
-    if (left < n && arr[left] > arr[largest])
-        largest = left;
+    if (izq < n && arr[izq] > arr[mayor])
+        mayor = izq;
 
-    if (right < n && arr[right] > arr[largest])
-        largest = right;
+    if (der < n && arr[der] > arr[mayor])
+        mayor = der;
 
-    if (largest != i) {
-        std::swap(arr[i], arr[largest]);
-        heapify(arr, n, largest);
+    if (mayor != i) {
+        swap(arr[i], arr[mayor]);
+        heapify(arr, n, mayor);
     }
 }
 
-void heapSort(std::vector<std::string>& arr) {
-    int n = (int)arr.size();
+// HeapSort
+void heapSort(vector<string>& arr) {
+    int n = arr.size();
 
-    // 1. Construir el max-heap
+    // Construir heap
     for (int i = n / 2 - 1; i >= 0; i--)
         heapify(arr, n, i);
 
-    // 2. Extraer elementos del heap uno por uno
+    // Ordenar
     for (int i = n - 1; i > 0; i--) {
-        std::swap(arr[0], arr[i]);  // mueve la raiz (mayor) al final
-        heapify(arr, i, 0);         // restaura el heap sin el ultimo elemento
+        swap(arr[0], arr[i]);
+        heapify(arr, i, 0);
     }
 }
