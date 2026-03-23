@@ -1,9 +1,7 @@
-#ifndef RANDOMIZAR_H
-#define RANDOMIZAR_H
-
+#pragma once
 #include <string>
 
-// Desordena aleatoriamente las palabras de dataset.txt (sobreescribe el mismo archivo)
-void randomizarDataset(const std::string& filepath = "dataset.txt");
-
-#endif
+// Lee dataset.txt, desordena las palabras aleatoriamente
+// y sobreescribe el mismo archivo con el nuevo orden.
+// Lanza std::runtime_error si el archivo no se puede abrir.
+void randomizarDataset(const std::string& filepath);

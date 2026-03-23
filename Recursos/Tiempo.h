@@ -1,11 +1,13 @@
-#ifndef TIEMPO_H
-#define TIEMPO_H
-
-#include <string>
+#pragma once
 #include <chrono>
-using namespace std;
 
-void iniciarTiempo();
-void detenerTiempo(string etiqueta);
+// Utilidades para medir tiempo de ejecucion con std::chrono
 
-#endif
+using Clock     = std::chrono::high_resolution_clock;
+using TimePoint = std::chrono::time_point<Clock>;
+
+// Retorna el instante actual
+TimePoint iniciarTiempo();
+
+// Retorna los milisegundos transcurridos desde 'inicio'
+double calcularTiempo(const TimePoint& inicio);

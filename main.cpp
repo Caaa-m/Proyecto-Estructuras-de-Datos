@@ -1,45 +1,216 @@
 #include <iostream>
-#include <cstdlib>
-#include <ctime>
-#include <fstream>
+#include <vector>
 #include <string>
-#include <direct.h>    // para crear carpeta en Windows
+#include <fstream>
+#include <iomanip>
+
+#include "Funciones_Palabras/Randomizar.h"
+#include "Funciones_Palabras/Convertir_txt.h"
 #include "Funciones_Palabras/Crear_txt.h"
-#include "Recursos/Complejidad.h"
+#include "Ordenamiento/Quick_Sort.h"
+#include "Ordenamiento/Heap_Sort.h"
+#include "Ordenamiento/AVL_Tree.h"
 #include "Recursos/Tiempo.h"
+#include "Recursos/Memoria.h"
+#include "Recursos/Complejidad.h"
+
 using namespace std;
 
 int main() {
-    iniciarTiempo();
-    srand(time(0));
 
-    string nombreCarpeta;
-    cout << "Nombre de la carpeta: ";
-    cin >> nombreCarpeta;
+    // ── 1. Seleccion del dataset ───────────────────────────────────────────
+    cout << "============================================================\n";
+    cout << "         SELECCIONE EL DATASET A UTILIZAR                  \n";
+    cout << "============================================================\n";
+    cout << "  1. Dataset del profesor (dataset.txt)\n";
+    cout << "  2. Dataset generado aleatoriamente (palabras inventadas)\n";
+    cout << "Opcion: ";
 
-    _mkdir(nombreCarpeta.c_str());  // crea la carpeta
+    int opcion;
+    cin >> opcion;
+    cout << "\n";
 
-    int cantidad;
-    cout << "Cuantas palabras quieres generar? ";
-    cin >> cantidad;
+    string archivoDataset = "dataset.txt";
 
-    string ruta = nombreCarpeta + "/palabras.txt";
-    ofstream archivo(ruta);
+    if (opcion == 2) {
+        int cantidad;
+        cout << "Cuantas palabras quieres generar? (recomendado: 100000): ";
+        cin >> cantidad;
 
-    for (int i = 0; i < cantidad; i++) {
-        archivo << generarPalabra() << endl;
+        ofstream archivo(archivoDataset);
+        for (int i = 0; i < cantidad; i++)
+            archivo << generarPalabra() << "\n";
+        archivo.close();
+
+        cout << cantidad << " palabras generadas y guardadas en '" << archivoDataset << "'\n\n";
+
+    } else {
+        cout << "Randomizando dataset...\n";
+        randomizarDataset(archivoDataset);
     }
 
-    archivo.close();
-    cout << "Archivo guardado en: " << ruta << endl;
-    detenerTiempo("Creación de un archivo con palabras aleatorias");
+    // ── 2. Cargar las palabras en un vector ────────────────────────────────
+    vector<string> palabrasOriginal = cargarDataset(archivoDataset);
 
+    if (palabrasOriginal.empty()) {
+        cerr << "Error: no se pudieron cargar las palabras.\n";
+        return 1;
+    }
 
+    int n = (int)palabrasOriginal.size();
+    cout << "Total de palabras cargadas: " << n << "\n\n";
 
-    /* string archivo;
-    cout << "Nombre del archivo a analizar: ";
-    cin >> archivo;
+    // ── 3. Menu principal ──────────────────────────────────────────────────
+    vector<string> dbOrdenada;
+    bool estaOrdenado = false;
+    int algoritmoUsado = 0; // 1=Quick, 2=Heap, 3=AVL
+    double tiempoQuick = 0, tiempoHeap = 0, tiempoAVL = 0;
+    size_t memQuick = 0, memHeap = 0, memAVL = 0;
 
-    analizarArchivo(archivo); */
+    int menuOpcion = 0;
+
+    do {
+        cout << "\n============================================================\n";
+        cout << "                     MENU PRINCIPAL                        \n";
+        cout << "============================================================\n";
+        cout << "  1. Ver dataset (imprimir todas las palabras)\n";
+        cout << "  2. Ordenar dataset\n";
+        if (estaOrdenado) {
+            cout << "  3. Ver estadisticas de ordenamiento\n";
+            cout << "  4. Ver complejidad algoritmica\n";
+        } else {
+            cout << "  3. Ver estadisticas de ordenamiento  [Requiere ordenar primero]\n";
+            cout << "  4. Ver complejidad algoritmica       [Requiere ordenar primero]\n";
+        }
+        cout << "  0. Salir\n";
+        cout << "Opcion: ";
+        cin >> menuOpcion;
+        cout << "\n";
+
+        switch (menuOpcion) {
+
+            // ── Ver dataset ────────────────────────────────────────────────
+            case 1: {
+                vector<string>& db = estaOrdenado ? dbOrdenada : palabrasOriginal;
+                cout << "============================================================\n";
+                cout << (estaOrdenado ? "  DATASET ORDENADO\n" : "  DATASET ORIGINAL (sin ordenar)\n");
+                cout << "============================================================\n";
+                for (int i = 0; i < (int)db.size(); i++)
+                    cout << i + 1 << ". " << db[i] << "\n";
+                cout << "============================================================\n";
+                cout << "Total: " << db.size() << " palabras\n";
+                break;
+            }
+
+            // ── Ordenar dataset ────────────────────────────────────────────
+            case 2: {
+                cout << "============================================================\n";
+                cout << "         SELECCIONE EL ALGORITMO DE ORDENAMIENTO           \n";
+                cout << "============================================================\n";
+                cout << "  1. QuickSort\n";
+                cout << "  2. HeapSort\n";
+                cout << "  3. AVL Tree\n";
+                cout << "Opcion: ";
+                int algOpcion;
+                cin >> algOpcion;
+                cout << "\n";
+
+                if (algOpcion == 1) {
+                    cout << "Ejecutando QuickSort...\n";
+                    dbOrdenada = palabrasOriginal;
+                    auto t1 = iniciarTiempo();
+                    quickSort(dbOrdenada, 0, (int)dbOrdenada.size() - 1);
+                    tiempoQuick = calcularTiempo(t1);
+                    memQuick = memoriaVector(dbOrdenada);
+                    algoritmoUsado = 1;
+                    estaOrdenado = true;
+                    cout << "QuickSort completado.\n";
+                    cout << "  Tiempo : " << tiempoQuick << " ms\n";
+                    cout << "  Memoria aprox: " << memQuick / 1024 << " KB\n";
+
+                } else if (algOpcion == 2) {
+                    cout << "Ejecutando HeapSort...\n";
+                    dbOrdenada = palabrasOriginal;
+                    auto t2 = iniciarTiempo();
+                    heapSort(dbOrdenada);
+                    tiempoHeap = calcularTiempo(t2);
+                    memHeap = memoriaVector(dbOrdenada);
+                    algoritmoUsado = 2;
+                    estaOrdenado = true;
+                    cout << "HeapSort completado.\n";
+                    cout << "  Tiempo : " << tiempoHeap << " ms\n";
+                    cout << "  Memoria aprox: " << memHeap / 1024 << " KB\n";
+
+                } else if (algOpcion == 3) {
+                    cout << "Ejecutando AVL Tree...\n";
+                    AVLNode* root = nullptr;
+                    auto t3 = iniciarTiempo();
+                    for (const string& palabra : palabrasOriginal)
+                        root = insertAVL(root, palabra);
+                    dbOrdenada.clear();
+                    dbOrdenada.reserve(n);
+                    inorder(root, dbOrdenada);
+                    tiempoAVL = calcularTiempo(t3);
+                    memAVL = memoriaAVL(n);
+                    deleteTree(root);
+                    algoritmoUsado = 3;
+                    estaOrdenado = true;
+                    cout << "AVL Tree completado.\n";
+                    cout << "  Tiempo : " << tiempoAVL << " ms\n";
+                    cout << "  Memoria aprox: " << memAVL / 1024 << " KB\n";
+
+                } else {
+                    cout << "Opcion invalida.\n";
+                }
+                break;
+            }
+
+            // ── Estadisticas de ordenamiento ───────────────────────────────
+            case 3: {
+                if (!estaOrdenado) {
+                    cout << "Primero debes ordenar el dataset (opcion 2).\n";
+                    break;
+                }
+                cout << "============================================================\n";
+                cout << "            ESTADISTICAS DEL ORDENAMIENTO                  \n";
+                cout << "============================================================\n";
+                if (algoritmoUsado == 1) {
+                    cout << left << setw(15) << "Algoritmo" << setw(15) << "Tiempo (ms)" << setw(15) << "Memoria (KB)" << "\n";
+                    cout << string(45, '-') << "\n";
+                    cout << left << setw(15) << "QuickSort" << setw(15) << tiempoQuick << setw(15) << memQuick / 1024 << "\n";
+                } else if (algoritmoUsado == 2) {
+                    cout << left << setw(15) << "Algoritmo" << setw(15) << "Tiempo (ms)" << setw(15) << "Memoria (KB)" << "\n";
+                    cout << string(45, '-') << "\n";
+                    cout << left << setw(15) << "HeapSort" << setw(15) << tiempoHeap << setw(15) << memHeap / 1024 << "\n";
+                } else if (algoritmoUsado == 3) {
+                    cout << left << setw(15) << "Algoritmo" << setw(15) << "Tiempo (ms)" << setw(15) << "Memoria (KB)" << "\n";
+                    cout << string(45, '-') << "\n";
+                    cout << left << setw(15) << "AVL Tree" << setw(15) << tiempoAVL << setw(15) << memAVL / 1024 << "\n";
+                }
+                cout << "============================================================\n";
+                break;
+            }
+
+            // ── Complejidad algoritmica ────────────────────────────────────
+            case 4: {
+                if (!estaOrdenado) {
+                    cout << "Primero debes ordenar el dataset (opcion 2).\n";
+                    break;
+                }
+                mostrarComplejidad();
+                break;
+            }
+
+            case 0:
+                cout << "Saliendo...\n";
+                break;
+
+            default:
+                cout << "Opcion invalida. Intenta de nuevo.\n";
+                break;
+        }
+
+    } while (menuOpcion != 0);
+
     return 0;
 }

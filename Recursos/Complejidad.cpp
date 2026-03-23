@@ -1,22 +1,21 @@
 #include "Complejidad.h"
 #include <iostream>
-#include <fstream> //Abrir, leer, escribir archivos
+#include <fstream>
 #include <string>
 using namespace std;
 
 void analizarArchivo(string nombreArchivo) {
-    ifstream archivo(nombreArchivo); //Lee el archivo
+    ifstream archivo(nombreArchivo);
     string linea;
 
-    int nivelActual = 0; //Nivel de anidación actual
-    int maxNivel = 0; //Máximo nivel de anidación encontrado
+    int nivelActual = 0;
+    int maxNivel = 0;
 
-    while (getline(archivo, linea)) { //Lee una Línea del archivo y la guarda en Línea
-                                      //Mientras haya una línea más por recorrer devuelve TRUE, si no devuelve FALSE
-        if (linea.find("for") != string::npos || linea.find("while") != string::npos) { // Si se encuentra un while o for...
-            nivelActual++; // Incrementa el nivel de anidación actual
+    while (getline(archivo, linea)) {
+        if (linea.find("for") != string::npos || linea.find("while") != string::npos) {
+            nivelActual++;
             if (nivelActual > maxNivel) {
-                maxNivel = nivelActual; // Actualiza el máximo nivel de anidación si el actual es mayor
+                maxNivel = nivelActual;
             }
         }
 
