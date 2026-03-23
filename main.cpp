@@ -12,15 +12,13 @@
 #include "Ordenamiento/AVL_Tree.h"
 #include "Recursos/Tiempo.h"
 #include "Recursos/Memoria.h"
-#include "Recursos/Complejidad.h"
+
 
 using namespace std;
 
 int main() {
 
-    cout << "====================================\n";
     cout << "   SELECCIONAR DATASET\n";
-    cout << "====================================\n";
     cout << "1. Usar dataset existente\n";
     cout << "2. Generar dataset aleatorio\n";
     cout << "Opcion: ";
@@ -67,7 +65,7 @@ int main() {
     int opcionMenu;
 
     do {
-        cout << "\n======== MENU ========\n";
+        cout << "\nMENU\n";
         cout << "1. Ver dataset\n";
         cout << "2. Ordenar dataset\n";
         cout << "3. Ver estadisticas\n";
@@ -152,17 +150,15 @@ int main() {
             }
 
             case 4: {
-                if (!estaOrdenado) {
-                    cout << "Primero ordena el dataset\n";
-                    break;
+                if (algoritmoUsado == 1) {
+                    cout << "QuickSort: O(n log n)\n";
+                } 
+                else if (algoritmoUsado == 2) {
+                    cout << "HeapSort: O(n log n)\n";
+                } 
+                else if (algoritmoUsado == 3) {
+                    cout << "AVL Tree: O(n log n)\n";
                 }
-
-                if (algoritmoUsado == 1)
-                    analizarArchivo("Ordenamiento/Quick_Sort.cpp");
-                else if (algoritmoUsado == 2)
-                    analizarArchivo("Ordenamiento/Heap_Sort.cpp");
-                else
-                    analizarArchivo("Ordenamiento/AVL_Tree.cpp");
 
                 break;
             }
