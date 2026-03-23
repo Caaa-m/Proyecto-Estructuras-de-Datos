@@ -2,7 +2,6 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include <iomanip>
 
 #include "Funciones_Palabras/Randomizar.h"
 #include "Funciones_Palabras/Convertir_txt.h"
@@ -13,43 +12,82 @@
 #include "Recursos/Tiempo.h"
 #include "Recursos/Memoria.h"
 
-
 using namespace std;
+
+// Funcion sencilla para copiar archivos
+void copiarArchivo(string origen, string destino) {
+    ifstream in(origen);
+    ofstream out(destino);
+
+    string linea;
+    while (getline(in, linea)) {
+        out << linea << "\n";
+    }
+
+    in.close();
+    out.close();
+}
 
 int main() {
 
+    cout << "====================================\n";
     cout << "   SELECCIONAR DATASET\n";
-    cout << "1. Usar dataset existente\n";
+    cout << "====================================\n";
+    cout << "1. Dataset del profesor\n";
     cout << "2. Generar dataset aleatorio\n";
     cout << "Opcion: ";
 
     int opcion;
     cin >> opcion;
 
-    string archivoDataset = "dataset.txt";
+    string archivoTrabajo; // ESTE es el que siempre usamos
 
-    // Generar o randomizar
-    if (opcion == 2) {
+    // ── CASO 1: DATASET DEL PROFESOR ─────────────────────
+    if (opcion == 1) {
+
+        // Copiamos el original a uno temporal
+        copiarArchivo("dataset.txt", "dataset_trabajo.txt");
+        archivoTrabajo = "dataset_trabajo.txt";
+
+        cout << "Dataset del profesor cargado (copia de trabajo)\n";
+
+        cout << "Deseas mezclarlo? (1=si, 0=no): ";
+        int mezclar;
+        cin >> mezclar;
+
+        if (mezclar == 1) {
+            randomizarDataset(archivoTrabajo);
+            cout << "Dataset mezclado\n";
+        }
+    }
+
+    // ── CASO 2: GENERAR DATASET ─────────────────────────
+    else if (opcion == 2) {
+
+        archivoTrabajo = "dataset_generado.txt";
+
         int cantidad;
         cout << "Cantidad de palabras: ";
         cin >> cantidad;
 
-        ofstream archivo(archivoDataset);
+        ofstream archivo(archivoTrabajo);
 
         for (int i = 0; i < cantidad; i++) {
             archivo << generarPalabra() << "\n";
         }
 
         archivo.close();
-        cout << "Dataset generado.\n";
 
-    } else {
-        cout << "Mezclando dataset...\n";
-        randomizarDataset(archivoDataset);
+        cout << "Dataset generado\n";
     }
 
-    // Cargar palabras
-    vector<string> palabrasOriginal = cargarDataset(archivoDataset);
+    else {
+        cout << "Opcion invalida\n";
+        return 1;
+    }
+
+    // ── Cargar palabras ─────────────────────────────────
+    vector<string> palabrasOriginal = cargarDataset(archivoTrabajo);
 
     if (palabrasOriginal.empty()) {
         cout << "Error cargando datos\n";
@@ -64,8 +102,9 @@ int main() {
 
     int opcionMenu;
 
+    // ── MENU ────────────────────────────────────────────
     do {
-        cout << "\nMENU\n";
+        cout << "\n=========== MENU ===========\n";
         cout << "1. Ver dataset\n";
         cout << "2. Ordenar dataset\n";
         cout << "3. Ver estadisticas\n";
@@ -95,23 +134,20 @@ int main() {
                 dbOrdenada = palabrasOriginal;
 
                 if (op == 1) {
-                    cout << "Ordenando con QuickSort...\n";
                     TimePoint t = iniciarTiempo();
                     quickSort(dbOrdenada, 0, dbOrdenada.size() - 1);
                     tiempoUsado = calcularTiempo(t);
                     memUsada = memoriaVector(dbOrdenada);
                     algoritmoUsado = 1;
-
-                } else if (op == 2) {
-                    cout << "Ordenando con HeapSort...\n";
+                }
+                else if (op == 2) {
                     TimePoint t = iniciarTiempo();
                     heapSort(dbOrdenada);
                     tiempoUsado = calcularTiempo(t);
                     memUsada = memoriaVector(dbOrdenada);
                     algoritmoUsado = 2;
-
-                } else if (op == 3) {
-                    cout << "Ordenando con AVL...\n";
+                }
+                else if (op == 3) {
                     AVLNode* root = nullptr;
 
                     TimePoint t = iniciarTiempo();
@@ -132,7 +168,7 @@ int main() {
 
                 estaOrdenado = true;
 
-                cout << "Tiempo: " << tiempoUsado << " s\n";
+                cout << "Tiempo: " << tiempoUsado << " ms\n";
                 cout << "Memoria aprox: " << memUsada / 1024 << " KB\n";
 
                 break;
@@ -144,21 +180,23 @@ int main() {
                     break;
                 }
 
-                cout << "Tiempo: " << tiempoUsado << "\n";
+                cout << "Tiempo: " << tiempoUsado << " ms\n";
                 cout << "Memoria: " << memUsada / 1024 << " KB\n";
                 break;
             }
 
             case 4: {
-                if (algoritmoUsado == 1) {
-                    cout << "QuickSort: O(n log n)\n";
-                } 
-                else if (algoritmoUsado == 2) {
-                    cout << "HeapSort: O(n log n)\n";
-                } 
-                else if (algoritmoUsado == 3) {
-                    cout << "AVL Tree: O(n log n)\n";
+                if (!estaOrdenado) {
+                    cout << "Primero ordena el dataset\n";
+                    break;
                 }
+
+                if (algoritmoUsado == 1)
+                    cout << "QuickSort: O(n log n)\n";
+                else if (algoritmoUsado == 2)
+                    cout << "HeapSort: O(n log n)\n";
+                else if (algoritmoUsado == 3)
+                    cout << "AVL Tree: O(n log n)\n";
 
                 break;
             }
