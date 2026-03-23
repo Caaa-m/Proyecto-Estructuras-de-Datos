@@ -3,43 +3,53 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-#include <random>
-#include <chrono>
-#include <stdexcept>
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
+using namespace std;
 
-void randomizarDataset(const std::string& filepath) {
+// Desordena las palabras de un archivo
+void randomizarDataset(const string& filepath) {
 
-    // ── 1. Leer todas las palabras del dataset ──────────────────────────────
-    std::ifstream inFile(filepath);
-    if (!inFile.is_open())
-        throw std::runtime_error("No se pudo abrir: " + filepath);
+    ifstream inFile(filepath);
 
-    std::vector<std::string> words;
-    words.reserve(100000);
+    // Verifica si se pudo abrir
+    if (!inFile.is_open()) {
+        cout << "No se pudo abrir el archivo" << endl;
+        return;
+    }
 
-    std::string word;
-    while (std::getline(inFile, word)) {
-        if (!word.empty() && word.back() == '\r')
-            word.pop_back();
+    vector<string> words;
+    string word;
+
+    // Leer todas las palabras
+    while (getline(inFile, word)) {
         if (!word.empty())
             words.push_back(word);
     }
+
     inFile.close();
 
-    // ── 2. Desordenar aleatoriamente ────────────────────────────────────────
-    unsigned seed = static_cast<unsigned>(
-        std::chrono::high_resolution_clock::now().time_since_epoch().count()
-    );
-    std::mt19937 rng(seed);
-    std::shuffle(words.begin(), words.end(), rng);
+    // Inicializar semilla
+    srand(time(0));
 
-    // ── 3. Sobreescribir el mismo archivo con las palabras desordenadas ─────
-    std::ofstream outFile(filepath);
-    if (!outFile.is_open())
-        throw std::runtime_error("No se pudo escribir en: " + filepath);
+    // Mezclar manualmente
+    for (int i = 0; i < words.size(); i++) {
+        int j = rand() % words.size();
+        swap(words[i], words[j]);
+    }
 
-    for (const std::string& w : words)
-        outFile << w << "\n";
+    // Sobrescribir archivo
+    ofstream outFile(filepath);
+
+    if (!outFile.is_open()) {
+        cout << "No se pudo escribir en el archivo" << endl;
+        return;
+    }
+
+    for (int i = 0; i < words.size(); i++) {
+        outFile << words[i] << "\n";
+    }
 
     outFile.close();
 }
