@@ -1,31 +1,33 @@
 #include "AVL_Tree.h"
 #include <algorithm>
-#include <vector>
-#include <string>
+using namespace std;
 
-// ── Utilidades internas ────────────────────────────────────────────────────
-
-static int height(AVLNode* n) {
-    return n ? n->height : 0;
+// Devuelve la altura del nodo (si es null, es 0)
+int height(AVLNode* n) {
+    if (n == nullptr) return 0;
+    return n->height;
 }
 
-static int getBalance(AVLNode* n) {
-    return n ? height(n->left) - height(n->right) : 0;
+// Calcula el balance (izquierda - derecha)
+int getBalance(AVLNode* n) {
+    if (n == nullptr) return 0;
+    return height(n->left) - height(n->right);
 }
 
-static void updateHeight(AVLNode* n) {
-    if (n)
-        n->height = 1 + std::max(height(n->left), height(n->right));
+// Actualiza la altura del nodo
+void updateHeight(AVLNode* n) {
+    if (n != nullptr) {
+        n->height = 1 + max(height(n->left), height(n->right));
+    }
 }
 
-// ── Rotaciones ─────────────────────────────────────────────────────────────
-
-static AVLNode* rotateRight(AVLNode* y) {
-    AVLNode* x  = y->left;
-    AVLNode* T2 = x->right;
+// Rotación simple a la derecha
+AVLNode* rotateRight(AVLNode* y) {
+    AVLNode* x = y->left;
+    AVLNode* temp = x->right;
 
     x->right = y;
-    y->left  = T2;
+    y->left = temp;
 
     updateHeight(y);
     updateHeight(x);
@@ -33,12 +35,13 @@ static AVLNode* rotateRight(AVLNode* y) {
     return x;
 }
 
-static AVLNode* rotateLeft(AVLNode* x) {
-    AVLNode* y  = x->right;
-    AVLNode* T2 = y->left;
+// Rotación simple a la izquierda
+AVLNode* rotateLeft(AVLNode* x) {
+    AVLNode* y = x->right;
+    AVLNode* temp = y->left;
 
-    y->left  = x;
-    x->right = T2;
+    y->left = x;
+    x->right = temp;
 
     updateHeight(x);
     updateHeight(y);
@@ -46,41 +49,41 @@ static AVLNode* rotateLeft(AVLNode* x) {
     return y;
 }
 
-// ── Insercion con balanceo automatico ─────────────────────────────────────
+// Inserta en el árbol AVL (como BST pero balanceando)
+AVLNode* insertAVL(AVLNode* root, const string& key) {
 
-AVLNode* insertAVL(AVLNode* root, const std::string& key) {
-    // 1. Insercion BST normal
-    if (!root)
+    // Inserción normal tipo árbol binario
+    if (root == nullptr)
         return new AVLNode(key);
 
     if (key < root->key)
-        root->left  = insertAVL(root->left,  key);
+        root->left = insertAVL(root->left, key);
     else if (key > root->key)
         root->right = insertAVL(root->right, key);
     else
-        return root; // duplicados ignorados
+        return root; // si es igual, no lo inserta
 
-    // 2. Actualizar altura
+    // Actualizar altura
     updateHeight(root);
 
-    // 3. Calcular balance y aplicar rotaciones si es necesario
+    // Ver si se desbalanceó
     int balance = getBalance(root);
 
-    // Caso Left-Left
+    // Caso izquierda-izquierda
     if (balance > 1 && key < root->left->key)
         return rotateRight(root);
 
-    // Caso Right-Right
+    // Caso derecha-derecha
     if (balance < -1 && key > root->right->key)
         return rotateLeft(root);
 
-    // Caso Left-Right
+    // Caso izquierda-derecha
     if (balance > 1 && key > root->left->key) {
         root->left = rotateLeft(root->left);
         return rotateRight(root);
     }
 
-    // Caso Right-Left
+    // Caso derecha-izquierda
     if (balance < -1 && key < root->right->key) {
         root->right = rotateRight(root->right);
         return rotateLeft(root);
@@ -89,19 +92,19 @@ AVLNode* insertAVL(AVLNode* root, const std::string& key) {
     return root;
 }
 
-// ── Recorrido inorder ──────────────────────────────────────────────────────
+// Recorrido inorder (sirve para obtener ordenado)
+void inorder(AVLNode* root, vector<string>& result) {
+    if (root == nullptr) return;
 
-void inorder(AVLNode* root, std::vector<std::string>& result) {
-    if (!root) return;
-    inorder(root->left,  result);
+    inorder(root->left, result);
     result.push_back(root->key);
     inorder(root->right, result);
 }
 
-// ── Liberar memoria ────────────────────────────────────────────────────────
-
+// Libera la memoria del árbol
 void deleteTree(AVLNode* root) {
-    if (!root) return;
+    if (root == nullptr) return;
+
     deleteTree(root->left);
     deleteTree(root->right);
     delete root;
