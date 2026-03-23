@@ -49,7 +49,7 @@ AVLNode* rotateLeft(AVLNode* x) {
     return y;
 }
 
-// Inserta en el árbol AVL (como BST pero balanceando)
+// Inserta en el árbol AVL
 AVLNode* insertAVL(AVLNode* root, const string& key) {
 
     // Inserción normal tipo árbol binario

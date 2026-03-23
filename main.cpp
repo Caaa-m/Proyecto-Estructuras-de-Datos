@@ -14,7 +14,7 @@
 
 using namespace std;
 
-// Funcion sencilla para copiar archivos
+// Funcion para copiar archivos
 void copiarArchivo(string origen, string destino) {
     ifstream in(origen);
     ofstream out(destino);
@@ -30,9 +30,7 @@ void copiarArchivo(string origen, string destino) {
 
 int main() {
 
-    cout << "====================================\n";
     cout << "   SELECCIONAR DATASET\n";
-    cout << "====================================\n";
     cout << "1. Dataset del profesor\n";
     cout << "2. Generar dataset aleatorio\n";
     cout << "Opcion: ";
@@ -40,9 +38,9 @@ int main() {
     int opcion;
     cin >> opcion;
 
-    string archivoTrabajo; // ESTE es el que siempre usamos
+    string archivoTrabajo; // Este es el que siempre usamos
 
-    // ── CASO 1: DATASET DEL PROFESOR ─────────────────────
+    // Caso 1: Dataset dado por el profesor
     if (opcion == 1) {
 
         // Copiamos el original a uno temporal
@@ -61,7 +59,7 @@ int main() {
         }
     }
 
-    // ── CASO 2: GENERAR DATASET ─────────────────────────
+    // Caso 2: Generar dataset aleatorio
     else if (opcion == 2) {
 
         archivoTrabajo = "dataset_generado.txt";
@@ -86,7 +84,7 @@ int main() {
         return 1;
     }
 
-    // ── Cargar palabras ─────────────────────────────────
+    // Cargar palabras
     vector<string> palabrasOriginal = cargarDataset(archivoTrabajo);
 
     if (palabrasOriginal.empty()) {
@@ -102,9 +100,9 @@ int main() {
 
     int opcionMenu;
 
-    // ── MENU ────────────────────────────────────────────
+    // Menú
     do {
-        cout << "\n=========== MENU ===========\n";
+        cout << "MENU \n";
         cout << "1. Ver dataset\n";
         cout << "2. Ordenar dataset\n";
         cout << "3. Ver estadisticas\n";
